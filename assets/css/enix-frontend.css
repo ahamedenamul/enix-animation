@@ -1,0 +1,62 @@
+/*! Enix Animation — frontend keyframes & states */
+
+/* Initial hidden state for any element with an animation type */
+.enix-anim-init[data-enix-animation]:not(.enix-anim-in) {
+	opacity: 0;
+	will-change: opacity, transform;
+}
+
+/* Per-type initial transforms */
+[data-enix-animation="fade-up"]:not(.enix-anim-in)      { transform: translate3d(0, 40px, 0); }
+[data-enix-animation="fade-down"]:not(.enix-anim-in)    { transform: translate3d(0, -40px, 0); }
+[data-enix-animation="fade-left"]:not(.enix-anim-in)    { transform: translate3d(40px, 0, 0); }
+[data-enix-animation="fade-right"]:not(.enix-anim-in)   { transform: translate3d(-40px, 0, 0); }
+[data-enix-animation="slide-up"]:not(.enix-anim-in)     { transform: translate3d(0, 100px, 0); }
+[data-enix-animation="slide-down"]:not(.enix-anim-in)   { transform: translate3d(0, -100px, 0); }
+[data-enix-animation="slide-left"]:not(.enix-anim-in)   { transform: translate3d(100px, 0, 0); }
+[data-enix-animation="slide-right"]:not(.enix-anim-in)  { transform: translate3d(-100px, 0, 0); }
+[data-enix-animation="zoom-in"]:not(.enix-anim-in)      { transform: scale(0.85); }
+[data-enix-animation="zoom-out"]:not(.enix-anim-in)     { transform: scale(1.15); }
+[data-enix-animation="zoom-in-up"]:not(.enix-anim-in)   { transform: scale(0.85) translate3d(0, 40px, 0); }
+[data-enix-animation="zoom-in-down"]:not(.enix-anim-in) { transform: scale(0.85) translate3d(0, -40px, 0); }
+[data-enix-animation="flip-x"]:not(.enix-anim-in)       { transform: perspective(800px) rotateX(90deg); }
+[data-enix-animation="flip-y"]:not(.enix-anim-in)       { transform: perspective(800px) rotateY(90deg); }
+[data-enix-animation="flip-up"]:not(.enix-anim-in)      { transform: perspective(800px) rotateX(-80deg); transform-origin: bottom; }
+[data-enix-animation="flip-down"]:not(.enix-anim-in)    { transform: perspective(800px) rotateX(80deg); transform-origin: top; }
+[data-enix-animation="rotate-in"]:not(.enix-anim-in)    { transform: rotate(-12deg) scale(0.9); }
+[data-enix-animation="bounce-in"]:not(.enix-anim-in)    { transform: scale(0.6); }
+[data-enix-animation="bounce-up"]:not(.enix-anim-in)    { transform: translate3d(0, 60px, 0); }
+[data-enix-animation="blur-in"]:not(.enix-anim-in)      { filter: blur(14px); }
+[data-enix-animation="skew-in"]:not(.enix-anim-in)      { transform: skewY(6deg) translate3d(0, 40px, 0); }
+
+/* Visible state */
+.enix-anim-init.enix-anim-in[data-enix-animation] {
+	opacity: 1;
+	transform: translate3d(0, 0, 0) scale(1) rotate(0) skew(0) perspective(800px) rotateX(0) rotateY(0);
+	filter: none;
+}
+
+/* Bounce uses a keyframe for a snappier feel */
+.enix-anim-init.enix-anim-in[data-enix-animation="bounce-in"],
+.enix-anim-init.enix-anim-in[data-enix-animation="bounce-up"] {
+	animation-name: enix-bounce;
+	animation-fill-mode: both;
+}
+
+@keyframes enix-bounce {
+	0%   { opacity: 0; transform: translate3d(0, 60px, 0) scale(0.85); }
+	60%  { opacity: 1; transform: translate3d(0, -10px, 0) scale(1.03); }
+	100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+/* Reduced motion — instantly show */
+@media (prefers-reduced-motion: reduce) {
+	.enix-anim-init[data-enix-animation] {
+		opacity: 1 !important;
+		transform: none !important;
+		filter: none !important;
+		transition: none !important;
+		animation: none !important;
+		will-change: auto !important;
+	}
+}
