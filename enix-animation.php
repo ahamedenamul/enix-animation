@@ -3,7 +3,7 @@
  * Plugin Name:       Enix Animation – Advanced Animation 
  * Plugin URI:        https://github.com/ahamedenamul/enix-animation
  * Description:       Adds advanced viewport scroll animations (bidirectional) to any Elementor element via the Advanced tab. 20+ animation styles, customizable duration, delay, easing & offset.
- * Version:           1.0.2
+ * Version:           1.0.3
  * Requires at least: 5.6
  * Requires PHP:      7.4
  * Author:            Enix Solutions Ltd (By Enamul Islam)
@@ -27,7 +27,7 @@ $enixUpdateChecker = PucFactory::buildUpdateChecker(
 );
 $enixUpdateChecker->setBranch( 'main' );
 
-define( 'ENIX_ANIMATION_VERSION', '1.0.2' );
+define( 'ENIX_ANIMATION_VERSION', '1.0.3' );
 define( 'ENIX_ANIMATION_FILE', __FILE__ );
 define( 'ENIX_ANIMATION_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ENIX_ANIMATION_URL', plugin_dir_url( __FILE__ ) );
