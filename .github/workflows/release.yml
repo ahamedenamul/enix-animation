@@ -1,0 +1,28 @@
+name: Create Enix Release
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Create Plugin ZIP
+        run: |
+          mkdir enix-animation
+          rsync -rr --exclude='.git/' --exclude='.github/' --exclude='enix-animation' ./ enix-animation/
+          zip -r enix-animation.zip enix-animation/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: enix-animation.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
