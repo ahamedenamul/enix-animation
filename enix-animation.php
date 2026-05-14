@@ -17,6 +17,16 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
+require_once plugin_dir_path( __FILE__ ) . 'plugin-update-checker/plugin-update-checker.php';
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
+
+$enixUpdateChecker = PucFactory::buildUpdateChecker(
+	'https://github.com/ahamedenamul/enix-animation/',
+	__FILE__,
+	'enix-animation'
+);
+$enixUpdateChecker->setBranch( 'main' );
+
 define( 'ENIX_ANIMATION_VERSION', '1.0.0' );
 define( 'ENIX_ANIMATION_FILE', __FILE__ );
 define( 'ENIX_ANIMATION_PATH', plugin_dir_path( __FILE__ ) );
