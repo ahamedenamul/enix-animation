@@ -1,4 +1,10 @@
-/*! Enix Animation — bidirectional viewport engine (vanilla JS) */
+/*! Enix Animation v1.0.4 — viewport engine (vanilla JS)
+ *  - Bidirectional by default (Animate Once = No)
+ *  - Animate Once = Yes  →  animation runs ONLY on scroll-down, exactly once.
+ *    If the element is first encountered while scrolling up (or already in
+ *    view on load above the current scroll position), it is shown instantly
+ *    without animation and never re-armed.
+ */
 (function () {
 	'use strict';
 
@@ -8,15 +14,26 @@
 
 	var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+	/* -------- scroll-direction tracker -------- */
+	var lastScrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+	var scrollDir   = 'down'; // assume down on first paint so above-the-fold animates
+	window.addEventListener('scroll', function () {
+		var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+		if (y > lastScrollY) {
+			scrollDir = 'down';
+		} else if (y < lastScrollY) {
+			scrollDir = 'up';
+		}
+		lastScrollY = y;
+	}, { passive: true });
+
 	function enixApplyTransition(el) {
 		var duration = parseInt(el.getAttribute('data-enix-duration'), 10) || 600;
 		var delay    = parseInt(el.getAttribute('data-enix-delay'), 10) || 0;
 		var easing   = el.getAttribute('data-enix-easing') || 'ease-out';
-		// transition covers all transform/opacity/filter properties
 		el.style.transition = 'opacity ' + duration + 'ms ' + easing + ' ' + delay + 'ms,' +
 			' transform ' + duration + 'ms ' + easing + ' ' + delay + 'ms,' +
 			' filter ' + duration + 'ms ' + easing + ' ' + delay + 'ms';
-		// For bounce keyframe-driven animations, sync animation-duration/delay/easing too
 		var type = el.getAttribute('data-enix-animation');
 		if (type === 'bounce-in' || type === 'bounce-up') {
 			el.style.animationDuration = duration + 'ms';
@@ -30,20 +47,23 @@
 		el.classList.add('enix-anim-in');
 	}
 
+	/* Show without animation (instant) — for once=yes encountered on scroll-up */
+	function enixShowInstant(el) {
+		el.style.transition = 'none';
+		el.style.animation  = 'none';
+		el.classList.add('enix-anim-in');
+	}
+
 	function enixHide(el) {
-		// Re-arm so the next entry plays the animation again
 		el.classList.remove('enix-anim-in');
-		// Clear keyframe animation so it can replay
 		var type = el.getAttribute('data-enix-animation');
 		if (type === 'bounce-in' || type === 'bounce-up') {
 			el.style.animation = 'none';
-			// force reflow then unset so it can run again
 			void el.offsetWidth;
 			el.style.animation = '';
 		}
 	}
 
-	// Group elements by offset so we use a unique observer per rootMargin.
 	var observers = {};
 
 	function enixGetObserver(offset) {
@@ -58,12 +78,19 @@
 				var once = el.getAttribute('data-enix-once') === 'yes';
 
 				if (entry.isIntersecting) {
-					enixShow(el);
 					if (once) {
+						// Only animate when user is scrolling DOWN.
+						if (scrollDir === 'down') {
+							enixShow(el);
+						} else {
+							// Scrolled up into it — just reveal, no animation.
+							enixShowInstant(el);
+						}
 						observers[key].unobserve(el);
+					} else {
+						enixShow(el);
 					}
 				} else if (!once) {
-					// Bidirectional: hide & re-arm when it leaves the viewport
 					enixHide(el);
 				}
 			});
@@ -100,9 +127,7 @@
 		enixInit();
 	}
 
-	// Re-scan on Elementor frontend init (editor preview & lazy content)
 	window.addEventListener('elementor/frontend/init', enixInit);
-	// Catch dynamically added content
 	if ('MutationObserver' in window) {
 		new MutationObserver(function () { enixInit(); })
 			.observe(document.documentElement, { childList: true, subtree: true });
